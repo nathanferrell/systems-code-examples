@@ -83,16 +83,17 @@ int int_stack_over(int_stack_t *stk) {
 int int_stack_rot(int_stack_t *stk) {
     if (stk->size < 3)
         return 0;
-    
-    int_entry_t *first = SLIST_FIRST(&stk->head);
-    int_entry_t *second = first->entries.sle_next;
-    int_entry_t *third = second->entries.sle_next;
-    
-    // Remove the third item
-    SLIST_REMOVE_AFTER(first, entries);
-    // Insert it as the new head
-    SLIST_INSERT_HEAD(&stk->head, third, entries);
-    
+
+    int third, second, first;
+    int_stack_pop(stk, &first);
+    int_stack_pop(stk, &second);
+    int_stack_pop(stk, &third);
+
+    // Push them back in the rotated order
+    int_stack_push(stk, second);
+    int_stack_push(stk, first);
+    int_stack_push(stk, third);
+
     return 1;
 }
 
