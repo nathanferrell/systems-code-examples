@@ -70,24 +70,32 @@ int int_stack_swap(int_stack_t *stk) {
 int int_stack_over(int_stack_t *stk) {
     if (stk->size < 2)
         return 0;
-    int top_value, next_to_top_value;
-    int_stack_top(stk, &top_value);
-    int_stack_pop(stk, &next_to_top_value);
-    int_stack_push(stk, next_to_top_value);
-    return int_stack_push(stk, top_value);
+    
+    int_entry_t *entry = SLIST_FIRST(&stk->head);
+    if (!entry || !(entry->entries.sle_next))
+        return 0; // Fail if there's no second item.
+    
+    int second_value = entry->entries.sle_next->value;
+    return int_stack_push(stk, second_value);
 }
+
 
 int int_stack_rot(int_stack_t *stk) {
     if (stk->size < 3)
         return 0;
-    int top_value, second_value, third_value;
-    int_stack_pop(stk, &top_value);
-    int_stack_pop(stk, &second_value);
-    int_stack_pop(stk, &third_value);
-    int_stack_push(stk, second_value);
-    int_stack_push(stk, top_value);
-    return int_stack_push(stk, third_value);
+    
+    int_entry_t *first = SLIST_FIRST(&stk->head);
+    int_entry_t *second = first->entries.sle_next;
+    int_entry_t *third = second->entries.sle_next;
+    
+    // Remove the third item
+    SLIST_REMOVE_AFTER(first, entries);
+    // Insert it as the new head
+    SLIST_INSERT_HEAD(&stk->head, third, entries);
+    
+    return 1;
 }
+
 
 int int_stack_drop(int_stack_t *stk) {
     if (stk->size < 1)
@@ -113,22 +121,40 @@ int int_stack_2swap(int_stack_t *stk) {
 int int_stack_2dup(int_stack_t *stk) {
     if (stk->size < 2)
         return 0;
-    int d1, d2;
-    int_stack_top(stk, &d1);
-    int_stack_pop(stk, &d2);
-    int_stack_push(stk, d2);
-    return int_stack_push(stk, d1);
+    
+    int top_value, second_value;
+    int_stack_pop(stk, &top_value);
+    int_stack_pop(stk, &second_value);
+    
+    // Push them back in reverse order to maintain the original stack order
+    int_stack_push(stk, second_value);
+    int_stack_push(stk, top_value);
+    int_stack_push(stk, second_value);
+    int_stack_push(stk, top_value);
+    
+    return 1;
 }
+
 
 int int_stack_2over(int_stack_t *stk) {
     if (stk->size < 4)
         return 0;
-    int d1, d2;
-    int_stack_top(stk, &d1);
-    int_stack_pop(stk, &d2);
-    int_stack_push(stk, d2);
-    return int_stack_push(stk, d1);
+
+    // Access the fourth and third items from the top
+    int_entry_t *fourth = SLIST_FIRST(&stk->head);
+    int_entry_t *third = fourth->entries.sle_next->entries.sle_next; // Skipping to the third
+    
+    // Store the values to be copied
+    int third_value = third->value;
+    int fourth_value = fourth->value;
+    
+    // Push the copied values onto the stack
+    int_stack_push(stk, fourth_value);
+    int_stack_push(stk, third_value);
+    
+    return 1;
 }
+
 
 int int_stack_2drop(int_stack_t *stk) {
     if (stk->size < 2)
