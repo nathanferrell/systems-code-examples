@@ -1,107 +1,212 @@
 //
-// Created by George Thiruvathukal on 2/17/24.
+// Expanded tests for int_stack operations.
 //
 
 #include <gtest/gtest.h>
-
 #include "int_stack.hh"
 
-TEST(IntStackTests, Initialization)
-{
-	int_stack_t stack1;
-	int_stack_init(&stack1, 10);
-	ASSERT_EQ(int_stack_size(&stack1), 0);
-	ASSERT_EQ(int_stack_capacity(&stack1), 10);
+TEST(IntStackTests, Initialization) {
+    int_stack_t stack;
+    int_stack_init(&stack, 10);
+    ASSERT_EQ(int_stack_size(&stack), 0);
+    ASSERT_EQ(int_stack_capacity(&stack), 10);
 }
 
-TEST(IntStackTests, PushToCapacityAndOverflow)
-{
-	// create stack that can hold 10 items
-	int_stack_t stack1;
-	const int capacity = 10;
-	int_stack_init(&stack1, capacity);
+TEST(IntStackTests, PushToCapacityAndOverflow) {
+    int_stack_t stack;
+    int_stack_init(&stack, 10);
+    for (int i = 0; i < 10; i++) {
+        ASSERT_TRUE(int_stack_push(&stack, i));
+    }
+    ASSERT_FALSE(int_stack_push(&stack, 11)); // Test overflow
+}
 
-	// fill it
-	for (int i=0; i < capacity; i++) {
-    	int result = int_stack_push(&stack1, i);
-    	ASSERT_TRUE(result);
-	}
+TEST(IntStackTests, PushToCapacityPopUntilUnderflow) {
+    int_stack_t stack;
+    int_stack_init(&stack, 10);
+    for (int i = 0; i < 10; i++) {
+        ASSERT_TRUE(int_stack_push(&stack, i));
+    }
+    int value;
+    for (int i = 9; i >= 0; i--) {
+        ASSERT_TRUE(int_stack_pop(&stack, &value));
+        ASSERT_EQ(value, i);
+    }
+    ASSERT_FALSE(int_stack_pop(&stack, &value)); // Test underflow
+}
 
-	// ensure it's full
-	ASSERT_EQ(int_stack_size(&stack1), capacity);
+TEST(IntStackTests, TopValue) {
+    int_stack_t stack;
+    int_stack_init(&stack, 10);
+    int_stack_push(&stack, 5);
+    int value;
+    ASSERT_TRUE(int_stack_top(&stack, &value));
+    ASSERT_EQ(value, 5);
+}
 
-	// try to add one more
-	int result = int_stack_push(&stack1, capacity+1);
+TEST(IntStackTests, DuplicateTop) {
+    int_stack_t stack;
+    int_stack_init(&stack, 10);
+    int_stack_push(&stack, 5);
+    ASSERT_TRUE(int_stack_dup(&stack));
+    int value;
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 5);
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 5);
+}
 
-	// and make sure it is an overflow (error)
-	ASSERT_FALSE(result);
+TEST(IntStackTests, SwapTopTwo) {
+    int_stack_t stack;
+    int_stack_init(&stack, 10);
+    int_stack_push(&stack, 1);
+    int_stack_push(&stack, 2);
+    ASSERT_TRUE(int_stack_swap(&stack));
+    int value;
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 1);
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 2);
+}
+
+TEST(IntStackTests, CopySecondItemToTop) {
+    int_stack_t stack;
+    int_stack_init(&stack, 10);
+    int_stack_push(&stack, 1);
+    int_stack_push(&stack, 2);
+    ASSERT_TRUE(int_stack_over(&stack));
+    int value;
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 1);
+}
+
+TEST(IntStackTests, RotateTopThree) {
+    int_stack_t stack;
+    int_stack_init(&stack, 10);
+    int_stack_push(&stack, 1);
+    int_stack_push(&stack, 2);
+    int_stack_push(&stack, 3);
+    ASSERT_TRUE(int_stack_rot(&stack));
+    int value;
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 2); // 2 should be on top after rotate
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 3); // 3 moves down
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 1); // 1 moves to second
+}
+
+TEST(IntStackTests, DropTop) {
+    int_stack_t stack;
+    int_stack_init(&stack, 10);
+    int_stack_push(&stack, 1);
+    int_stack_push(&stack, 2);
+    ASSERT_TRUE(int_stack_drop(&stack));
+    ASSERT_EQ(int_stack_size(&stack), 1); // Size should decrease by 1
+    int value;
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 1); // Verify that 2 was dropped
+}
+
+TEST(IntStackTests, SwapTopTwoPairs) {
+    int_stack_t stack;
+    int_stack_init(&stack, 10);
+    int_stack_push(&stack, 1);
+    int_stack_push(&stack, 2);
+    int_stack_push(&stack, 3);
+    int_stack_push(&stack, 4);
+    ASSERT_TRUE(int_stack_2swap(&stack));
+    int value;
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 2); // After swap, 2 is top
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 1); // Then 1
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 4); // Then 4 (swapped)
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 3); // Then 3 (swapped)
+}
+
+TEST(IntStackTests, DuplicateTopTwo) {
+    int_stack_t stack;
+    int_stack_init(&stack, 10);
+    int_stack_push(&stack, 1);
+    int_stack_push(&stack, 2);
+    ASSERT_TRUE(int_stack_2dup(&stack));
+    ASSERT_EQ(int_stack_size(&stack), 4); // Size should double
+    int value;
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 2); // Duplicated values on top
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 1); // Duplicated values on top
+}
+
+TEST(IntStackTests, CopyTwoValuesBeneathTopTwo) {
+    int_stack_t stack;
+    int_stack_init(&stack, 10);
+    int_stack_push(&stack, 1);
+    int_stack_push(&stack, 2);
+    int_stack_push(&stack, 3);
+    int_stack_push(&stack, 4);
+    ASSERT_TRUE(int_stack_2over(&stack));
+    ASSERT_EQ(int_stack_size(&stack), 6); // Size increases by 2
+    int value;
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 2); // Copied values on top
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 1); // Copied values on top
+}
+
+TEST(IntStackTests, DropTopTwo) {
+    int_stack_t stack;
+    int_stack_init(&stack, 10);
+    int_stack_push(&stack, 1);
+    int_stack_push(&stack, 2);
+    int_stack_push(&stack, 3);
+    ASSERT_TRUE(int_stack_2drop(&stack));
+    ASSERT_EQ(int_stack_size(&stack), 1); // Size decreases by 2
+    int value;
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 1); // Verify remaining value
+}
+
+TEST(IntStackTests, AddTopTwoValues) {
+    int_stack_t stack;
+    int_stack_init(&stack, 10);
+    int_stack_push(&stack, 1);
+    int_stack_push(&stack, 2);
+    ASSERT_TRUE(int_stack_add(&stack));
+    ASSERT_EQ(int_stack_size(&stack), 1); // Size decreases by 1 after add
+    int value;
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 3); // Verify addition result
 }
 
 
-TEST(IntStackTests, PushToCapcacityPopUntilUnderflow)
-{
-	// create stack that can hold 10 items [similar to previous test]
-	int_stack_t stack1;
-	const int capacity = 10;
-	int_stack_init(&stack1, capacity);
 
-	// fill it
-	for (int i=0; i < capacity; i++) {
-    	int result = int_stack_push(&stack1, i);
-    	ASSERT_TRUE(result);
-	}
-
-	// now drain it one item at a time, ensuring each item is the value expected
-	for (int i=capacity-1; i >= 0; i--) {
-    	int top_value;
-    	int result = int_stack_pop(&stack1, &top_value);
-    	ASSERT_EQ(i, top_value);
-	}
-
-	// try to remove from empty stack and ensure it fails
-	int top_value;
-	int result = int_stack_pop(&stack1, &top_value);
-	ASSERT_FALSE(result);
+// Edge Case Tests
+TEST(IntStackTests, EmptyStackOperations) {
+    int_stack_t stack;
+    int_stack_init(&stack, 10);
+    int value;
+    ASSERT_FALSE(int_stack_pop(&stack, &value)); // Pop from empty
+    ASSERT_FALSE(int_stack_top(&stack, &value)); // Top from empty
+    ASSERT_FALSE(int_stack_dup(&stack)); // Dup on empty
+    ASSERT_FALSE(int_stack_swap(&stack)); // Swap on empty
 }
 
-TEST(IntStackTests, OverOperation)
-{
-	int_stack_t stack;
-	int_stack_init(&stack, 5);
-
-	int_stack_push(&stack, 10);
-	int_stack_push(&stack, 20);
-
-	int_stack_over(&stack);
-
-	int top_value;
-	int_stack_top(&stack, &top_value);
-
-	ASSERT_EQ(top_value, 20);
+TEST(IntStackTests, CapacityLimits) {
+    int_stack_t stack;
+    int_stack_init(&stack, 2);
+    ASSERT_TRUE(int_stack_push(&stack, 1));
+    ASSERT_TRUE(int_stack_push(&stack, 2));
+    ASSERT_FALSE(int_stack_push(&stack, 3)); // Push beyond capacity
+    int value;
+    ASSERT_TRUE(int_stack_pop(&stack, &value)); // Pop to make space
+    ASSERT_TRUE(int_stack_push(&stack, 3)); // Push should succeed now
 }
 
-TEST(IntStackTests, RotOperation)
-{
-	int_stack_t stack;
-	int_stack_init(&stack, 5);
-
-	int_stack_push(&stack, 10);
-	int_stack_push(&stack, 20);
-	int_stack_push(&stack, 30);
-
-	int_stack_rot(&stack);
-
-	int top_value;
-	int_stack_top(&stack, &top_value);
-
-	ASSERT_EQ(top_value, 20);
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
-
-// Include tests for other new operations similarly
-
-int main(int argc, char **argv)
-{
-	testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
-}
-
