@@ -81,21 +81,21 @@ int int_stack_over(int_stack_t *stk) {
 
 
 int int_stack_rot(int_stack_t *stk) {
-    if (stk->size < 3)
-        return 0;
+    if (stk->size < 3) return 0;
 
-    int third, second, first;
-    int_stack_pop(stk, &first);
-    int_stack_pop(stk, &second);
-    int_stack_pop(stk, &third);
+    int temp[3];
+    for (int i = 0; i < 3; ++i) {
+        if (!int_stack_pop(stk, &temp[i])) return 0; // Fail if pop fails
+    }
 
-    // Push them back in the rotated order
-    int_stack_push(stk, second);
-    int_stack_push(stk, first);
-    int_stack_push(stk, third);
+    // Re-add them in rotated order: second, first, third from the top
+    int_stack_push(stk, temp[0]); // Originally third
+    int_stack_push(stk, temp[2]); // Originally first
+    int_stack_push(stk, temp[1]); // Originally second
 
     return 1;
 }
+
 
 
 int int_stack_drop(int_stack_t *stk) {
@@ -138,23 +138,26 @@ int int_stack_2dup(int_stack_t *stk) {
 
 
 int int_stack_2over(int_stack_t *stk) {
-    if (stk->size < 4)
-        return 0;
+    if (stk->size < 4) return 0;
 
-    // Access the fourth and third items from the top
-    int_entry_t *fourth = SLIST_FIRST(&stk->head);
-    int_entry_t *third = fourth->entries.sle_next->entries.sle_next; // Skipping to the third
-    
-    // Store the values to be copied
-    int third_value = third->value;
-    int fourth_value = fourth->value;
-    
-    // Push the copied values onto the stack
-    int_stack_push(stk, fourth_value);
-    int_stack_push(stk, third_value);
-    
+    int temp[4];
+    // Temporarily remove the top four elements to access the third and fourth
+    for (int i = 0; i < 4; ++i) {
+        if (!int_stack_pop(stk, &temp[i])) return 0; // Fail if pop fails
+    }
+
+    // Re-add the third and fourth elements first to copy them to the top
+    int_stack_push(stk, temp[1]); // Originally fourth
+    int_stack_push(stk, temp[2]); // Originally third
+
+    // Re-add the original top four elements
+    for (int i = 3; i >= 0; --i) {
+        int_stack_push(stk, temp[i]);
+    }
+
     return 1;
 }
+
 
 
 int int_stack_2drop(int_stack_t *stk) {
