@@ -81,20 +81,26 @@ int int_stack_over(int_stack_t *stk) {
 
 
 int int_stack_rot(int_stack_t *stk) {
-    if (stk->size < 3) return 0;
+    int value1, value2, value3;
 
-    int temp[3];
-    for (int i = 0; i < 3; ++i) {
-        if (!int_stack_pop(stk, &temp[i])) return 0; // Fail if pop fails
+    // Check if the stack has at least three elements
+    if (stk->size < 3) {
+        return 0; // Fail, not enough elements to perform rot
     }
 
-    // Re-add them in rotated order: second, first, third from the top
-    int_stack_push(stk, temp[0]); // Originally third
-    int_stack_push(stk, temp[2]); // Originally first
-    int_stack_push(stk, temp[1]); // Originally second
+    // Pop the top three elements
+    if (!int_stack_pop(stk, &value1) || !int_stack_pop(stk, &value2) || !int_stack_pop(stk, &value3)) {
+        return 0; // Fail, error during pop
+    }
 
-    return 1;
+    // Push them back in the rotated order
+    int_stack_push(stk, value2); // Now the second element becomes the top
+    int_stack_push(stk, value1); // Then, what was the top element
+    int_stack_push(stk, value3); // Finally, the third element becomes the bottom of these three
+
+    return 1; // Success
 }
+
 
 
 
