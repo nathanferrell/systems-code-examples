@@ -138,25 +138,32 @@ int int_stack_2dup(int_stack_t *stk) {
 
 
 int int_stack_2over(int_stack_t *stk) {
-    if (stk->size < 4) return 0;
+    if (stk->size < 4) return 0; // Ensure there are at least four elements.
 
-    int temp[4];
-    // Temporarily remove the top four elements to access the third and fourth
-    for (int i = 0; i < 4; ++i) {
-        if (!int_stack_pop(stk, &temp[i])) return 0; // Fail if pop fails
+    // Temporary storage for stack elements
+    int temp[stk->size];
+    int i = 0;
+
+    // Pop elements into temporary storage
+    while (!SLIST_EMPTY(&(stk->head))) {
+        int_stack_pop(stk, &temp[i++]);
     }
 
-    // Re-add the third and fourth elements first to copy them to the top
-    int_stack_push(stk, temp[1]); // Originally fourth
-    int_stack_push(stk, temp[2]); // Originally third
+    // The stack is now empty, and we have all elements in temp[].
+    // The order in temp[] is reversed: temp[0] is the original top.
 
-    // Re-add the original top four elements
-    for (int i = 3; i >= 0; --i) {
-        int_stack_push(stk, temp[i]);
+    // Push elements back, duplicating the second pair from the "bottom"
+    for (int j = i - 1; j >= 0; --j) {
+        int_stack_push(stk, temp[j]);
+        if (j == 1) { // Duplicate the second and first elements from the original stack
+            int_stack_push(stk, temp[1]); // Original second element
+            int_stack_push(stk, temp[0]); // Original first element
+        }
     }
 
     return 1;
 }
+
 
 
 
