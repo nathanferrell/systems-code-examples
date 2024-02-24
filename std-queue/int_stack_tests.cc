@@ -147,7 +147,7 @@ TEST(IntStackTests, DuplicateTopTwo) {
 
 TEST(IntStackTests, TwoOverOperation) {
     int_stack_t stack;
-    int_stack_init(&stack); // Assume this function initializes the stack, possibly with a specific size if required
+    int_stack_init(&stack, 10); // Correct initialization with capacity
 
     // Push some values onto the stack
     int_stack_push(&stack, 3); // Bottom
@@ -158,28 +158,27 @@ TEST(IntStackTests, TwoOverOperation) {
     // Perform the 2OVER operation
     ASSERT_TRUE(int_stack_2over(&stack)); // Verify that 2OVER operation succeeds
 
-    // The stack should now be: 3, 5, 8, 1, 8 (from bottom to top)
+    // After the 2OVER operation, the stack should now be: 3, 5, 8, 1, 8 (from bottom to top)
 
-    // Verify the stack size has increased by 1
+    // Verify the stack size has increased by 1, indicating a new item was added
     ASSERT_EQ(int_stack_size(&stack), 5);
 
-    // Verify the top of the stack is now the duplicated value
+    // Verify the top of the stack is now the duplicated value (8, which was the second item from the top)
     int value;
     int_stack_pop(&stack, &value);
-    ASSERT_EQ(value, 8);
+    ASSERT_EQ(value, 8); // Top value after 2OVER
 
     // Verify the rest of the stack is as expected
     int_stack_pop(&stack, &value);
-    ASSERT_EQ(value, 1);
+    ASSERT_EQ(value, 1); // Then the value that was at the top
     int_stack_pop(&stack, &value);
-    ASSERT_EQ(value, 8);
+    ASSERT_EQ(value, 8); // Then the original second-to-top value, now in the middle
     int_stack_pop(&stack, &value);
-    ASSERT_EQ(value, 5);
+    ASSERT_EQ(value, 5); // Then the next value
     int_stack_pop(&stack, &value);
-    ASSERT_EQ(value, 3);
-
-    // Clean up the stack if necessary
+    ASSERT_EQ(value, 3); // Finally, the original bottom value
 }
+
 
 TEST(IntStackTests, CopyTwoValuesBeneathTopTwo) {
     int_stack_t stack;
