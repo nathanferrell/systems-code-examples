@@ -90,8 +90,8 @@ int int_stack_rot(int_stack_t *stk) {
 
     // Re-add them in rotated order: second, first, third from the top
     int_stack_push(stk, temp[0]); // Originally third
-    int_stack_push(stk, temp[1]); // Originally first
-    int_stack_push(stk, temp[2]); // Originally second
+    int_stack_push(stk, temp[2]); // Originally first
+    int_stack_push(stk, temp[1]); // Originally second
 
     return 1;
 }
