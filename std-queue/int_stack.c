@@ -143,31 +143,43 @@ int int_stack_2dup(int_stack_t *stk) {
 }
 
 
-int int_stack_2over(int_stack_t *stk) {
-    if (stk->size < 4) return 0; // Ensure there are at least four elements.
+iint int_stack_2over(int_stack_t *stk) {
+    int d1, d2;
 
-    // Temporary storage for stack elements
-    int temp[stk->size];
-    int i = 0;
-
-    // Pop elements into temporary storage
-    while (!SLIST_EMPTY(&(stk->head))) {
-        int_stack_pop(stk, &temp[i++]);
+    // Check if the stack has at least two elements (for two pairs, it needs at least 4)
+    if (stk->size < 4) {
+        return 0; // Fail, not enough elements to perform 2OVER
     }
 
-    // The stack is now empty, and we have all elements in temp[].
-    // The order in temp[] is reversed: temp[0] is the original top.
+    // Temporary storage for the top elements that need to be moved
+    int temp[4];
+    int success = 1;
 
-    // Push elements back, duplicating the second pair from the "bottom"
-    for (int j = i - 1; j >= 0; --j) {
-        int_stack_push(stk, temp[j]);
-        if (j == 1) { // Duplicate the second and first elements from the original stack
-            int_stack_push(stk, temp[1]); // Original second element
-            int_stack_push(stk, temp[0]); // Original first element
+    // Pop the top four elements to access the second pair
+    for (int i = 0; i < 4; i++) {
+        if (!int_stack_pop(stk, &temp[i])) {
+            success = 0; // Fail, error during pop
+            break;
         }
     }
 
-    return 1;
+    if (!success) {
+        // If there was an error popping, we attempt to push back any popped elements
+        for (int i = 3; i >= 0; i--) {
+            if (i < 4) int_stack_push(stk, temp[i]);
+        }
+        return 0; // Return failure
+    }
+
+    // Push back the elements in the correct order to duplicate the second pair
+    int_stack_push(stk, temp[3]); // Original 4th
+    int_stack_push(stk, temp[2]); // Original 3rd
+    int_stack_push(stk, temp[1]); // Duplicate of the original 2nd
+    int_stack_push(stk, temp[0]); // Duplicate of the original 1st
+    int_stack_push(stk, temp[3]); // Original 4th
+    int_stack_push(stk, temp[2]); // Original 3rd
+
+    return 1; // Success
 }
 
 
