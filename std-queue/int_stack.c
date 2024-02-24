@@ -143,7 +143,7 @@ int int_stack_2dup(int_stack_t *stk) {
 }
 
 
-iint int_stack_2over(int_stack_t *stk) {
+int int_stack_2over(int_stack_t *stk) {
     int d1, d2;
 
     // Check if the stack has at least two elements (for two pairs, it needs at least 4)
