@@ -83,17 +83,21 @@ TEST(IntStackTests, CopySecondItemToTop) {
 TEST(IntStackTests, RotateTopThree) {
     int_stack_t stack;
     int_stack_init(&stack, 10);
-    int_stack_push(&stack, 1);
-    int_stack_push(&stack, 2);
-    int_stack_push(&stack, 3);
+    int_stack_push(&stack, 1); // Bottom of the three
+    int_stack_push(&stack, 2); // Middle
+    int_stack_push(&stack, 3); // Top
+
     ASSERT_TRUE(int_stack_rot(&stack));
+
     int value;
     int_stack_pop(&stack, &value);
-    ASSERT_EQ(value, 2); // 2 should be on top after rotate
+    ASSERT_EQ(value, 1); // Now on top after rotation
+
     int_stack_pop(&stack, &value);
-    ASSERT_EQ(value, 3); // 3 moves down
+    ASSERT_EQ(value, 3); // Now in the middle
+
     int_stack_pop(&stack, &value);
-    ASSERT_EQ(value, 1); // 1 moves to second
+    ASSERT_EQ(value, 2); // Now at the bottom
 }
 
 TEST(IntStackTests, DropTop) {
@@ -144,18 +148,33 @@ TEST(IntStackTests, DuplicateTopTwo) {
 TEST(IntStackTests, CopyTwoValuesBeneathTopTwo) {
     int_stack_t stack;
     int_stack_init(&stack, 10);
-    int_stack_push(&stack, 1);
+    int_stack_push(&stack, 1); // Bottom
     int_stack_push(&stack, 2);
     int_stack_push(&stack, 3);
-    int_stack_push(&stack, 4);
+    int_stack_push(&stack, 4); // Top
+
     ASSERT_TRUE(int_stack_2over(&stack));
     ASSERT_EQ(int_stack_size(&stack), 6); // Size increases by 2
+
     int value;
     int_stack_pop(&stack, &value);
-    ASSERT_EQ(value, 2); // Copied values on top
+    ASSERT_EQ(value, 4); // Most recent top value
     int_stack_pop(&stack, &value);
-    ASSERT_EQ(value, 1); // Copied values on top
+    ASSERT_EQ(value, 3); // Second top value
+
+    // Checking the duplicated values on top now
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 2); // Copied value
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 1); // Copied value
+
+    // Checking the original bottom two values
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 2); // Original second value
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 1); // Original bottom value
 }
+
 
 TEST(IntStackTests, DropTopTwo) {
     int_stack_t stack;
