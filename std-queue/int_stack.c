@@ -1,7 +1,4 @@
-// int_stack.c
-
 #include "int_stack.h"
-
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -67,6 +64,78 @@ int int_stack_swap(int_stack_t *stk) {
     int_stack_pop(stk, &next_to_top_value);
     int_stack_push(stk, top_value);
     return int_stack_push(stk, next_to_top_value); // success only if last operation succeeds
+}
+
+/* New stack operations */
+int int_stack_over(int_stack_t *stk) {
+    if (stk->size < 2)
+        return 0;
+    int top_value, next_to_top_value;
+    int_stack_top(stk, &top_value);
+    int_stack_pop(stk, &next_to_top_value);
+    int_stack_push(stk, next_to_top_value);
+    return int_stack_push(stk, top_value);
+}
+
+int int_stack_rot(int_stack_t *stk) {
+    if (stk->size < 3)
+        return 0;
+    int top_value, second_value, third_value;
+    int_stack_pop(stk, &top_value);
+    int_stack_pop(stk, &second_value);
+    int_stack_pop(stk, &third_value);
+    int_stack_push(stk, second_value);
+    int_stack_push(stk, top_value);
+    return int_stack_push(stk, third_value);
+}
+
+int int_stack_drop(int_stack_t *stk) {
+    if (stk->size < 1)
+        return 0;
+    int top_value;
+    return int_stack_pop(stk, &top_value);
+}
+
+int int_stack_2swap(int_stack_t *stk) {
+    if (stk->size < 4)
+        return 0;
+    int d1, d2, d3, d4;
+    int_stack_pop(stk, &d1);
+    int_stack_pop(stk, &d2);
+    int_stack_pop(stk, &d3);
+    int_stack_pop(stk, &d4);
+    int_stack_push(stk, d2);
+    int_stack_push(stk, d1);
+    int_stack_push(stk, d4);
+    return int_stack_push(stk, d3);
+}
+
+int int_stack_2dup(int_stack_t *stk) {
+    if (stk->size < 2)
+        return 0;
+    int d1, d2;
+    int_stack_top(stk, &d1);
+    int_stack_pop(stk, &d2);
+    int_stack_push(stk, d2);
+    return int_stack_push(stk, d1);
+}
+
+int int_stack_2over(int_stack_t *stk) {
+    if (stk->size < 4)
+        return 0;
+    int d1, d2;
+    int_stack_top(stk, &d1);
+    int_stack_pop(stk, &d2);
+    int_stack_push(stk, d2);
+    return int_stack_push(stk, d1);
+}
+
+int int_stack_2drop(int_stack_t *stk) {
+    if (stk->size < 2)
+        return 0;
+    int d1, d2;
+    int_stack_pop(stk, &d1);
+    return int_stack_pop(stk, &d2);
 }
 
 /* Example of how to create a binary operator that works o top two elements (if present) */
