@@ -144,40 +144,24 @@ int int_stack_2dup(int_stack_t *stk) {
 
 
 int int_stack_2over(int_stack_t *stk) {
-    int d1, d2;
-
-    // Check if the stack has at least two elements (for two pairs, it needs at least 4)
-    if (stk->size < 4) {
-        return 0; // Fail, not enough elements to perform 2OVER
+    // Check if the stack has at least two elements
+    if (stk->size < 2) {
+        return 0; // Not enough elements to perform 2OVER
     }
 
-    // Temporary storage for the top elements that need to be moved
-    int temp[4];
-    int success = 1;
-
-    // Pop the top four elements to access the second pair
-    for (int i = 0; i < 4; i++) {
-        if (!int_stack_pop(stk, &temp[i])) {
-            success = 0; // Fail, error during pop
-            break;
-        }
+    int top, second;
+    // Pop the top two elements
+    if (!int_stack_pop(stk, &top) || !int_stack_pop(stk, &second)) {
+        // Handle error if pop fails, though it should not given the size check
+        return 0; // Failure
     }
 
-    if (!success) {
-        // If there was an error popping, we attempt to push back any popped elements
-        for (int i = 3; i >= 0; i--) {
-            if (i < 4) int_stack_push(stk, temp[i]);
-        }
-        return 0; // Return failure
-    }
-
-    // Push back the elements in the correct order to duplicate the second pair
-    int_stack_push(stk, temp[3]); // Original 4th
-    int_stack_push(stk, temp[2]); // Original 3rd
-    int_stack_push(stk, temp[1]); // Duplicate of the original 2nd
-    int_stack_push(stk, temp[0]); // Duplicate of the original 1st
-    int_stack_push(stk, temp[3]); // Original 4th
-    int_stack_push(stk, temp[2]); // Original 3rd
+    // Push the second item (the one we want to duplicate) back onto the stack
+    int_stack_push(stk, second);
+    // Push the top item back onto the stack to restore the original order
+    int_stack_push(stk, top);
+    // Push the second item again onto the top to duplicate it per 2OVER operation
+    int_stack_push(stk, second);
 
     return 1; // Success
 }

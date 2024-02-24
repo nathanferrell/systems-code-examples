@@ -145,6 +145,42 @@ TEST(IntStackTests, DuplicateTopTwo) {
     ASSERT_EQ(value, 1); // Duplicated values on top
 }
 
+TEST(IntStackTests, TwoOverOperation) {
+    int_stack_t stack;
+    int_stack_init(&stack); // Assume this function initializes the stack, possibly with a specific size if required
+
+    // Push some values onto the stack
+    int_stack_push(&stack, 3); // Bottom
+    int_stack_push(&stack, 5);
+    int_stack_push(&stack, 8);
+    int_stack_push(&stack, 1); // Top
+
+    // Perform the 2OVER operation
+    ASSERT_TRUE(int_stack_2over(&stack)); // Verify that 2OVER operation succeeds
+
+    // The stack should now be: 3, 5, 8, 1, 8 (from bottom to top)
+
+    // Verify the stack size has increased by 1
+    ASSERT_EQ(int_stack_size(&stack), 5);
+
+    // Verify the top of the stack is now the duplicated value
+    int value;
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 8);
+
+    // Verify the rest of the stack is as expected
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 1);
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 8);
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 5);
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 3);
+
+    // Clean up the stack if necessary
+}
+
 TEST(IntStackTests, CopyTwoValuesBeneathTopTwo) {
     int_stack_t stack;
     int_stack_init(&stack, 10);
