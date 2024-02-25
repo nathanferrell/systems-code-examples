@@ -150,29 +150,23 @@ int int_stack_2over(int_stack_t *stk) {
         return 0; // Indicate failure
     }
 
-    // Temporary pointers to navigate the stack
-    int_entry_t *current = stk->top;
+    int_entry_t *current = SLIST_FIRST(&stk->head);
     int values[2];
-    int i;
+    int i = 0;
 
-    // Navigate to the fourth element
-    for (i = 0; i < 3 && current != NULL; i++) {
-        current = current->next;
+    // Navigate to the third element from the top
+    for (i = 0; i < 2; i++) {
+        current = SLIST_NEXT(current, entries);
     }
 
-    // Safety check, though this condition should never be true if the size check above is correct
-    if (current == NULL || current->next == NULL) {
-        return 0; // Indicate failure due to unexpected stack structure
-    }
+    // Assuming the list has at least four elements based on the size check
+    values[0] = SLIST_NEXT(current, entries)->value; // Fourth value
+    values[1] = current->value; // Third value
 
-    // Store the third and fourth values
-    values[0] = current->value; // Fourth value
-    values[1] = current->next->value; // Third value
-
-    // Push the stored values onto the stack in reverse order to maintain original order
+    // Push the third and fourth values back onto the stack
     for (i = 1; i >= 0; i--) {
         if (!int_stack_push(stk, values[i])) {
-            // Handle push failure, perhaps by attempting to undo any partial operation
+            // Push failed, handle error if needed
             return 0; // Indicate failure
         }
     }
