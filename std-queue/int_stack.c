@@ -146,25 +146,38 @@ int int_stack_2dup(int_stack_t *stk) {
 
 int int_stack_2over(int_stack_t *stk) {
     if (stk->size < 4) {
-        printf("Not enough elements for 2OVER operation.\n");
-        return 0; // fail
+        // Not enough elements for 2OVER operation
+        return 0; // Indicate failure
     }
 
-    // Access the fourth and third elements from the top
-    int fourth_value, third_value;
-    int_entry_t *entry = SLIST_FIRST(&stk->head);
-    for (int i = 0; i < 3; ++i) {
-        entry = SLIST_NEXT(entry, entries);
-    }
-    fourth_value = entry->value;
-    third_value = SLIST_NEXT(entry, entries)->value;
+    // Temporary pointers to navigate the stack
+    int_entry_t *current = stk->top;
+    int values[2];
+    int i;
 
-    // Push the third and fourth values onto the stack
-    if (!int_stack_push(stk, fourth_value) || !int_stack_push(stk, third_value)) {
-        return 0; // fail if either push fails
+    // Navigate to the fourth element
+    for (i = 0; i < 3 && current != NULL; i++) {
+        current = current->next;
     }
 
-    return 1; // success
+    // Safety check, though this condition should never be true if the size check above is correct
+    if (current == NULL || current->next == NULL) {
+        return 0; // Indicate failure due to unexpected stack structure
+    }
+
+    // Store the third and fourth values
+    values[0] = current->value; // Fourth value
+    values[1] = current->next->value; // Third value
+
+    // Push the stored values onto the stack in reverse order to maintain original order
+    for (i = 1; i >= 0; i--) {
+        if (!int_stack_push(stk, values[i])) {
+            // Handle push failure, perhaps by attempting to undo any partial operation
+            return 0; // Indicate failure
+        }
+    }
+
+    return 1; // Indicate success
 }
 
 
