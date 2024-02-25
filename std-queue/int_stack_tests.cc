@@ -145,40 +145,29 @@ TEST(IntStackTests, DuplicateTopTwo) {
     ASSERT_EQ(value, 1); // Duplicated values on top
 }
 
+
 TEST(IntStackTests, TwoOverOperation) {
     int_stack_t stack;
-    int_stack_init(&stack, 10); // Correct initialization with capacity
+    int_stack_init(&stack, 10);
 
-    // Push some values onto the stack
-    int_stack_push(&stack, 3); // Bottom
-    int_stack_push(&stack, 5);
-    int_stack_push(&stack, 8);
-    int_stack_push(&stack, 1); // Top
+    // Setup stack with at least four elements
+    int_stack_push(&stack, 1);
+    int_stack_push(&stack, 2);
+    int_stack_push(&stack, 3);
+    int_stack_push(&stack, 4);
 
-    // Perform the 2OVER operation
-    ASSERT_TRUE(int_stack_2over(&stack)); // Verify that 2OVER operation succeeds
+    // Perform 2OVER operation
+    ASSERT_TRUE(int_stack_2over(&stack));
 
-    // After the 2OVER operation, the stack should now be: 3, 5, 8, 1, 8 (from bottom to top)
-
-    // Verify the stack size has increased by 1, indicating a new item was added
-    ASSERT_EQ(int_stack_size(&stack), 5);
-
-    // Verify the top of the stack is now the duplicated value (8, which was the second item from the top)
+    // Assert the stack now contains the correct elements after 2OVER
     int value;
     int_stack_pop(&stack, &value);
-    ASSERT_EQ(value, 8); // Top value after 2OVER
+    ASSERT_EQ(value, 2); // Top value should be second of the duplicated pair
+    int_stack_pop(&stack, &value);
+    ASSERT_EQ(value, 1); // Next value should be first of the duplicated pair
 
-    // Verify the rest of the stack is as expected
-    int_stack_pop(&stack, &value);
-    ASSERT_EQ(value, 1); // Then the value that was at the top
-    int_stack_pop(&stack, &value);
-    ASSERT_EQ(value, 8); // Then the original second-to-top value, now in the middle
-    int_stack_pop(&stack, &value);
-    ASSERT_EQ(value, 5); // Then the next value
-    int_stack_pop(&stack, &value);
-    ASSERT_EQ(value, 3); // Finally, the original bottom value
+    // Cleanup by popping remaining elements (not shown)
 }
-
 
 
 

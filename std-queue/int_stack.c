@@ -143,28 +143,30 @@ int int_stack_2dup(int_stack_t *stk) {
 }
 
 
+
 int int_stack_2over(int_stack_t *stk) {
-    // Check if the stack has at least two elements
-    if (stk->size < 2) {
-        return 0; // Not enough elements to perform 2OVER
+    if (stk->size < 4) {
+        printf("Not enough elements for 2OVER operation.\n");
+        return 0; // fail
     }
 
-    int top, second;
-    // Pop the top two elements
-    if (!int_stack_pop(stk, &top) || !int_stack_pop(stk, &second)) {
-        // Handle error if pop fails, though it should not given the size check
-        return 0; // Failure
+    // Access the fourth and third elements from the top
+    int fourth_value, third_value;
+    int_entry_t *entry = SLIST_FIRST(&stk->head);
+    for (int i = 0; i < 3; ++i) {
+        entry = SLIST_NEXT(entry, entries);
+    }
+    fourth_value = entry->value;
+    third_value = SLIST_NEXT(entry, entries)->value;
+
+    // Push the third and fourth values onto the stack
+    if (!int_stack_push(stk, fourth_value) || !int_stack_push(stk, third_value)) {
+        return 0; // fail if either push fails
     }
 
-    // Push the second item (the one we want to duplicate) back onto the stack
-    int_stack_push(stk, second);
-    // Push the top item back onto the stack to restore the original order
-    int_stack_push(stk, top);
-    // Push the second item again onto the top to duplicate it per 2OVER operation
-    int_stack_push(stk, second);
-
-    return 1; // Success
+    return 1; // success
 }
+
 
 
 
