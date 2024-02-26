@@ -168,6 +168,58 @@ TEST(IntStackTests, TwoOverOperation) {
 
     // Cleanup by popping remaining elements (not shown)
 }
+TEST(IntStackTests, Subtraction) {
+    int_stack_t stack;
+    int_stack_init(&stack, 10);
+    int_stack_push(&stack, 5);
+    int_stack_push(&stack, 3);
+    int_stack_sub(&stack);
+    int result;
+    int_stack_pop(&stack, &result);
+    ASSERT_EQ(result, 2);
+}
+TEST(IntStackTests, Multiplication) {
+    int_stack_t stack;
+    int_stack_init(&stack, 10);
+    int_stack_push(&stack, 4);
+    int_stack_push(&stack, 5);
+    int_stack_mul(&stack);
+    int result;
+    int_stack_pop(&stack, &result);
+    ASSERT_EQ(result, 20);
+}
+TEST(IntStackTests, Division) {
+    int_stack_t stack;
+    int_stack_init(&stack, 10);
+    int_stack_push(&stack, 10);
+    int_stack_push(&stack, 2);
+    int_stack_div(&stack);
+    int result;
+    int_stack_pop(&stack, &result);
+    ASSERT_EQ(result, 5);
+}
+TEST(IntStackTests, DivMod) {
+    int_stack_t stack;
+    int_stack_init(&stack, 10);
+    int_stack_push(&stack, 10);
+    int_stack_push(&stack, 3);
+    int_stack_divmod(&stack);
+    int quotient, remainder;
+    int_stack_pop(&stack, &quotient);
+    int_stack_pop(&stack, &remainder);
+    ASSERT_EQ(remainder, 1);
+    ASSERT_EQ(quotient, 3);
+}
+TEST(IntStackTests, Modulus) {
+    int_stack_t stack;
+    int_stack_init(&stack, 10);
+    int_stack_push(&stack, 10);
+    int_stack_push(&stack, 3);
+    int_stack_mod(&stack);
+    int result;
+    int_stack_pop(&stack, &result);
+    ASSERT_EQ(result, 1);
+}
 
 
 

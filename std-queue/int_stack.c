@@ -176,8 +176,6 @@ int int_stack_2over(int_stack_t *stk) {
 
 
 
-
-
 int int_stack_2drop(int_stack_t *stk) {
     if (stk->size < 2)
         return 0;
@@ -186,7 +184,7 @@ int int_stack_2drop(int_stack_t *stk) {
     return int_stack_pop(stk, &d2);
 }
 
-/* Example of how to create a binary operator that works o top two elements (if present) */
+
 
 int int_stack_add(int_stack_t *stk) {
     if (stk->size < 2)
@@ -217,4 +215,63 @@ int int_stack_size(int_stack_t* stk) {
 
 int int_stack_capacity(int_stack_t* stk) {
     return stk->capacity;
+}
+int int_stack_sub(int_stack_t *stk) {
+    if (stk->size < 2)
+        return 0;
+    int top_value, next_to_top_value;
+    int_stack_pop(stk, &top_value);
+    int_stack_pop(stk, &next_to_top_value);
+    return int_stack_push(stk, next_to_top_value - top_value);
+}
+
+int int_stack_mul(int_stack_t *stk) {
+    if (stk->size < 2)
+        return 0;
+    int top_value, next_to_top_value;
+    int_stack_pop(stk, &top_value);
+    int_stack_pop(stk, &next_to_top_value);
+    return int_stack_push(stk, top_value * next_to_top_value);
+}
+
+int int_stack_div(int_stack_t *stk) {
+    if (stk->size < 2)
+        return 0;
+    int top_value, next_to_top_value;
+    int_stack_pop(stk, &top_value);
+    int_stack_pop(stk, &next_to_top_value);
+    if (top_value == 0) {
+        printf("Error: Division by zero.\n");
+        return 0;
+    }
+    return int_stack_push(stk, next_to_top_value / top_value);
+}
+
+int int_stack_divmod(int_stack_t *stk) {
+    if (stk->size < 2)
+        return 0;
+    int divisor, dividend;
+    int_stack_pop(stk, &divisor);
+    int_stack_pop(stk, &dividend);
+    if (divisor == 0) {
+        printf("Error: Division by zero.\n");
+        return 0;
+    }
+    int quotient = dividend / divisor;
+    int remainder = dividend % divisor;
+    int_stack_push(stk, remainder);
+    return int_stack_push(stk, quotient);
+}
+
+int int_stack_mod(int_stack_t *stk) {
+    if (stk->size < 2)
+        return 0;
+    int divisor, dividend;
+    int_stack_pop(stk, &divisor);
+    int_stack_pop(stk, &dividend);
+    if (divisor == 0) {
+        printf("Error: Division by zero.\n");
+        return 0;
+    }
+    return int_stack_push(stk, dividend % divisor);
 }
