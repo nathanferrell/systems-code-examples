@@ -1,5 +1,5 @@
 //
-// Expanded tests for int_stack operations.
+// tests for int_stack operations.
 //
 
 #include <gtest/gtest.h>
@@ -162,9 +162,9 @@ TEST(IntStackTests, TwoOverOperation) {
     // Assert the stack now contains the correct elements after 2OVER
     int value;
     int_stack_pop(&stack, &value);
-    ASSERT_EQ(value, 1); // Top value should be second of the duplicated pair
+    ASSERT_EQ(value, 1);
     int_stack_pop(&stack, &value);
-    ASSERT_EQ(value, 2); // Next value should be first of the duplicated pair
+    ASSERT_EQ(value, 2); 
 
     // Cleanup by popping remaining elements (not shown)
 }
