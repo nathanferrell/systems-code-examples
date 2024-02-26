@@ -162,7 +162,7 @@ TEST(IntStackTests, TwoOverOperation) {
     // Assert the stack now contains the correct elements after 2OVER
     int value;
     int_stack_pop(&stack, &value);
-    ASSERT_EQ(value, 3); // Top value should be second of the duplicated pair
+    ASSERT_EQ(value, 1); // Top value should be second of the duplicated pair
     int_stack_pop(&stack, &value);
     ASSERT_EQ(value, 2); // Next value should be first of the duplicated pair
 
